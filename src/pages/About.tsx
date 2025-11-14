@@ -1,8 +1,15 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ThreadLine from "@/components/ThreadLine";
+import { motion } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
 const About = () => {
+  const { ref: storyRef, isInView: storyInView } = useScrollAnimation();
+  const { ref: experienceRef, isInView: experienceInView } = useScrollAnimation();
+  const { ref: philosophyRef, isInView: philosophyInView } = useScrollAnimation();
+  const { ref: ctaRef, isInView: ctaInView } = useScrollAnimation();
+
   return (
     <div className="min-h-screen py-24">
       <div className="container mx-auto px-6">
@@ -15,28 +22,44 @@ const About = () => {
         </div>
 
         {/* Story */}
-        <div className="max-w-4xl mx-auto space-y-8 text-lg leading-relaxed mb-24">
-          <p className="text-foreground animate-fade-in">
-            <span className="font-serif text-2xl text-gold">Sutra</span> is a full-stack creative and growth agency based in Mumbai.
-          </p>
-
-          <p className="text-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <span className="font-serif text-2xl text-gold">Sutra</span> means "thread" — the connection between creativity, strategy, and commerce.
-          </p>
-
-          <p className="text-foreground animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            We build brands through stories crafted with cinematic precision and commercial clarity.
-          </p>
-
-          <p className="text-foreground animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            We believe in <span className="text-gold font-medium">"The Thread"</span>: one connected system where strategy fuels creativity and creativity fuels growth.
-          </p>
-        </div>
+        <motion.div 
+          ref={storyRef}
+          className="max-w-4xl mx-auto space-y-8 text-lg leading-relaxed mb-24"
+        >
+          {[
+            <>
+              <span className="font-serif text-2xl text-gold">Sutra</span> is a full-stack creative and growth agency based in Mumbai.
+            </>,
+            <>
+              <span className="font-serif text-2xl text-gold">Sutra</span> means "thread" — the connection between creativity, strategy, and commerce.
+            </>,
+            "We build brands through stories crafted with cinematic precision and commercial clarity.",
+            <>
+              We believe in <span className="text-gold font-medium">"The Thread"</span>: one connected system where strategy fuels creativity and creativity fuels growth.
+            </>
+          ].map((text, idx) => (
+            <motion.p 
+              key={idx}
+              className="text-foreground"
+              initial={{ opacity: 0, y: 30 }}
+              animate={storyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: idx * 0.15 }}
+            >
+              {text}
+            </motion.p>
+          ))}
+        </motion.div>
 
         <ThreadLine />
 
         {/* Experience */}
-        <div className="max-w-4xl mx-auto mb-24 animate-fade-in">
+        <motion.div 
+          ref={experienceRef}
+          className="max-w-4xl mx-auto mb-24"
+          initial={{ opacity: 0, y: 50 }}
+          animate={experienceInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.8 }}
+        >
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-8 text-center">
             Built By Experience
           </h2>
@@ -45,39 +68,59 @@ const About = () => {
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
             {["Flipkart", "Star Sports", "Heineken", "IPL", "F4", "Nayara Energy"].map((brand, idx) => (
-              <div 
+              <motion.div 
                 key={brand}
                 className="text-muted-foreground hover:text-gold transition-colors duration-300 font-sans tracking-wide text-lg"
-                style={{ animationDelay: `${idx * 0.1}s` }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={experienceInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.5, delay: 0.5 + idx * 0.1 }}
               >
                 {brand}
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         <ThreadLine />
 
         {/* Philosophy */}
-        <div className="max-w-4xl mx-auto mb-24 text-center animate-fade-in">
+        <motion.div 
+          ref={philosophyRef}
+          className="max-w-4xl mx-auto mb-24 text-center"
+          initial={{ opacity: 0, y: 50 }}
+          animate={philosophyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.8 }}
+        >
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-8">
             Our Philosophy
           </h2>
           <div className="space-y-6 text-lg">
-            <p className="text-foreground">
-              Every brand has a story worth telling.
-            </p>
-            <p className="text-foreground">
-              Every story needs the right system to scale.
-            </p>
-            <p className="text-gold font-medium">
-              And every great system is held together by a single thread.
-            </p>
+            {[
+              { text: "Every brand has a story worth telling.", className: "text-foreground" },
+              { text: "Every story needs the right system to scale.", className: "text-foreground" },
+              { text: "And every great system is held together by a single thread.", className: "text-gold font-medium" }
+            ].map((item, idx) => (
+              <motion.p 
+                key={idx}
+                className={item.className}
+                initial={{ opacity: 0, x: -20 }}
+                animate={philosophyInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                transition={{ duration: 0.6, delay: 0.3 + idx * 0.2 }}
+              >
+                {item.text}
+              </motion.p>
+            ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* CTA */}
-        <div className="text-center animate-fade-in">
+        <motion.div 
+          ref={ctaRef}
+          className="text-center"
+          initial={{ opacity: 0, y: 40 }}
+          animate={ctaInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+          transition={{ duration: 0.8 }}
+        >
           <p className="font-serif text-2xl md:text-3xl text-foreground mb-8">
             Every brand has a story. Let's tell yours.
           </p>
@@ -89,7 +132,7 @@ const About = () => {
               Start Your Story
             </Button>
           </Link>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

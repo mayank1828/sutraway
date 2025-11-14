@@ -2,38 +2,71 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ThreadLine from "@/components/ThreadLine";
 import heroImage from "@/assets/hero-bg.jpg";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
 const Home = () => {
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 500], [0, 150]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const { ref: experienceRef, isInView: experienceInView } = useScrollAnimation();
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section 
-        className="relative min-h-screen flex items-center justify-center bg-cover bg-center"
+        className="relative min-h-screen flex items-center justify-center bg-cover bg-center overflow-hidden"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-black/60" />
+        <motion.div 
+          className="absolute inset-0 bg-black/60"
+          style={{ y }}
+        />
         
-        <div className="relative z-10 container mx-auto px-6 text-center animate-fade-in-slow">
+        <motion.div 
+          className="relative z-10 container mx-auto px-6 text-center"
+          style={{ opacity }}
+        >
           {/* Logo */}
-          <div className="mb-8">
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
             <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl font-bold text-gold tracking-wider mb-2">
               SUTRA
             </h1>
             <div className="w-24 h-px bg-gold mx-auto opacity-50" />
-          </div>
+          </motion.div>
 
           {/* Tagline */}
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 tracking-wide">
+          <motion.h2 
+            className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 tracking-wide"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+          >
             THE THREAD CONNECTING ALL YOUR NEEDS
-          </h2>
+          </motion.h2>
 
           {/* Sub-line */}
-          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-12">
+          <motion.p 
+            className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.6 }}
+          >
             We connect creativity, strategy, and commerce under one thread.
-          </p>
+          </motion.p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.8 }}
+          >
             <Link to="/work">
               <Button 
                 size="lg"
@@ -51,15 +84,21 @@ const Home = () => {
                 Start a Project
               </Button>
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       <ThreadLine />
 
       {/* Experience Section */}
       <section className="py-24 container mx-auto px-6">
-        <div className="text-center max-w-4xl mx-auto animate-fade-in">
+        <motion.div 
+          ref={experienceRef}
+          className="text-center max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 50 }}
+          animate={experienceInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.8 }}
+        >
           <h3 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Experience that speaks before we do.
           </h3>
@@ -69,16 +108,19 @@ const Home = () => {
 
           {/* Brand Logos */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-            {["Flipkart", "Star Sports", "Heineken", "IPL", "F4", "Nayara Energy"].map((brand) => (
-              <div 
+            {["Flipkart", "Star Sports", "Heineken", "IPL", "F4", "Nayara Energy"].map((brand, idx) => (
+              <motion.div 
                 key={brand}
                 className="text-muted-foreground hover:text-gold transition-all duration-300 hover:scale-110 cursor-pointer font-sans text-sm tracking-wider"
+                initial={{ opacity: 0, y: 20 }}
+                animate={experienceInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.5, delay: 0.8 + idx * 0.1 }}
               >
                 {brand}
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );

@@ -6,9 +6,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import SectionTitle from "@/components/SectionTitle";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
 const Contact = () => {
   const { toast } = useToast();
+  const { ref: formRef, isInView: formInView } = useScrollAnimation();
+  const { ref: infoRef, isInView: infoInView } = useScrollAnimation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -61,7 +65,14 @@ const Contact = () => {
 
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16">
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
+          <motion.form 
+            ref={formRef}
+            onSubmit={handleSubmit} 
+            className="space-y-6"
+            initial={{ opacity: 0, x: -60 }}
+            animate={formInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -60 }}
+            transition={{ duration: 0.8 }}
+          >
             <div>
               <Input
                 placeholder="Your Name"
@@ -139,10 +150,16 @@ const Contact = () => {
             >
               Send It Across →
             </Button>
-          </form>
+          </motion.form>
 
           {/* Contact Info */}
-          <div className="space-y-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <motion.div 
+            ref={infoRef}
+            className="space-y-12"
+            initial={{ opacity: 0, x: 60 }}
+            animate={infoInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 60 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
             <div>
               <h3 className="font-serif text-3xl font-bold text-foreground mb-8">
                 Get in Touch
@@ -193,7 +210,7 @@ const Contact = () => {
                 "Every thread begins with a conversation."
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

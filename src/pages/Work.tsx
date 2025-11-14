@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import SectionTitle from "@/components/SectionTitle";
+import { motion } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
 const Work = () => {
+  const { ref: gridRef, isInView: gridInView } = useScrollAnimation({ margin: "-50px" });
+  const { ref: ctaRef, isInView: ctaInView } = useScrollAnimation();
+
   const projects = [
     {
       category: "Fashion",
@@ -65,12 +70,15 @@ const Work = () => {
         />
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+        <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
           {projects.map((project, index) => (
-            <div 
+            <motion.div 
               key={index}
-              className="group cursor-pointer animate-fade-in"
-              style={{ animationDelay: `${index * 0.05}s` }}
+              className="group cursor-pointer"
+              initial={{ opacity: 0, y: 60 }}
+              animate={gridInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
+              whileHover={{ y: -10 }}
             >
               <div className="bg-card border border-border aspect-[4/5] mb-4 overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -85,12 +93,18 @@ const Work = () => {
                 </h3>
                 <p className="text-muted-foreground text-sm">{project.description}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* CTA */}
-        <div className="text-center animate-fade-in">
+        <motion.div 
+          ref={ctaRef}
+          className="text-center"
+          initial={{ opacity: 0, y: 40 }}
+          animate={ctaInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+          transition={{ duration: 0.8 }}
+        >
           <p className="font-serif text-2xl md:text-3xl text-foreground mb-8">
             Let's create your next story.
           </p>
@@ -102,7 +116,7 @@ const Work = () => {
               Start Your Project
             </Button>
           </Link>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,8 +1,14 @@
 import SectionTitle from "@/components/SectionTitle";
 import ThreadLine from "@/components/ThreadLine";
 import { Lightbulb, Camera, ShoppingCart, TrendingUp, Handshake } from "lucide-react";
+import { motion } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
 const WhatWeDo = () => {
+  const { ref: headerRef, isInView: headerInView } = useScrollAnimation();
+  const { ref: bodyRef, isInView: bodyInView } = useScrollAnimation();
+  const { ref: pillarsRef, isInView: pillarsInView } = useScrollAnimation();
+
   const pillars = [
     {
       icon: Lightbulb,
@@ -35,7 +41,13 @@ const WhatWeDo = () => {
     <div className="min-h-screen py-24">
       <div className="container mx-auto px-6">
         {/* Header */}
-        <div className="text-center max-w-4xl mx-auto mb-24 animate-fade-in">
+        <motion.div 
+          ref={headerRef}
+          className="text-center max-w-4xl mx-auto mb-24"
+          initial={{ opacity: 0, y: 50 }}
+          animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.8 }}
+        >
           <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6">
             THE SUTRA WAY
           </h1>
@@ -45,30 +57,47 @@ const WhatWeDo = () => {
           <p className="text-muted-foreground text-lg leading-relaxed">
             One continuous thread connects our foundations: Marketing & Strategy, Content Production, E-Commerce, Growth & Media, and Brand Collaborations.
           </p>
-        </div>
+        </motion.div>
 
         <ThreadLine />
 
         {/* Body Copy */}
-        <div className="max-w-4xl mx-auto mb-24 space-y-6 text-center animate-fade-in">
-          <p className="text-foreground text-xl leading-relaxed">
-            Every brand has a story. We help you tell it, scale it, and sell it.
-          </p>
-          <p className="text-foreground text-xl leading-relaxed">
-            From positioning and production to performance and partnerships — Sutra connects it all.
-          </p>
-          <p className="text-foreground text-xl leading-relaxed">
-            We don't just create campaigns — we build systems.
-          </p>
-          <p className="text-gold text-xl leading-relaxed font-medium">
+        <motion.div 
+          ref={bodyRef}
+          className="max-w-4xl mx-auto mb-24 space-y-6 text-center"
+          initial={{ opacity: 0, y: 50 }}
+          animate={bodyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.8 }}
+        >
+          {[
+            "Every brand has a story. We help you tell it, scale it, and sell it.",
+            "From positioning and production to performance and partnerships — Sutra connects it all.",
+            "We don't just create campaigns — we build systems."
+          ].map((text, idx) => (
+            <motion.p 
+              key={idx}
+              className="text-foreground text-xl leading-relaxed"
+              initial={{ opacity: 0, x: -20 }}
+              animate={bodyInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+              transition={{ duration: 0.6, delay: idx * 0.2 }}
+            >
+              {text}
+            </motion.p>
+          ))}
+          <motion.p 
+            className="text-gold text-xl leading-relaxed font-medium"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={bodyInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
             Because when everything moves in sync, stories start to sell themselves.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         <ThreadLine />
 
         {/* Five Pillars */}
-        <div className="max-w-6xl mx-auto">
+        <div ref={pillarsRef} className="max-w-6xl mx-auto">
           <SectionTitle 
             title="Our Five Pillars" 
             subtitle="A comprehensive approach to brand growth"
@@ -76,10 +105,13 @@ const WhatWeDo = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {pillars.map((pillar, index) => (
-              <div 
+              <motion.div 
                 key={pillar.title}
-                className="bg-card border border-border p-8 hover:border-gold transition-all duration-300 group animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="bg-card border border-border p-8 hover:border-gold transition-all duration-300 group"
+                initial={{ opacity: 0, y: 50 }}
+                animate={pillarsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+                transition={{ duration: 0.6, delay: index * 0.15 }}
+                whileHover={{ y: -8, scale: 1.02 }}
               >
                 <pillar.icon className="w-12 h-12 text-gold mb-6 group-hover:scale-110 transition-transform duration-300" />
                 <h3 className="font-serif text-2xl font-bold text-foreground mb-4">
@@ -88,7 +120,7 @@ const WhatWeDo = () => {
                 <p className="text-muted-foreground">
                   {pillar.description}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

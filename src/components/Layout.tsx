@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import sutraLogo from "@/assets/sutra-logo.png";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -25,8 +26,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="font-serif text-2xl font-bold text-gold tracking-wider hover:text-primary transition-colors">
-              SUTRA
+            <Link to="/" className="hover:opacity-80 transition-opacity">
+              <img src={sutraLogo} alt="SUTRA" className="h-12 w-auto" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -84,9 +85,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <footer className="border-t border-border mt-32 py-12">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="font-serif text-2xl font-bold text-gold tracking-wider">
-              SUTRA
-            </div>
+            <img src={sutraLogo} alt="SUTRA" className="h-10 w-auto" />
             <div className="text-muted-foreground text-sm">
               © 2025 SUTRA. Every thread begins with a conversation.
             </div>

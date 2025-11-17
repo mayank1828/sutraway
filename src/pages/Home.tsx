@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ThreadLine from "@/components/ThreadLine";
 import heroImage from "@/assets/hero-bg.jpg";
+import sutraLogo from "@/assets/sutra-logo.png";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
@@ -29,15 +30,12 @@ const Home = () => {
         >
           {/* Logo */}
           <motion.div 
-            className="mb-8"
+            className="mb-12"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.2 }}
           >
-            <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl font-bold text-gold tracking-wider mb-2">
-              SUTRA
-            </h1>
-            <div className="w-24 h-px bg-gold mx-auto opacity-50" />
+            <img src={sutraLogo} alt="SUTRA" className="h-32 md:h-40 lg:h-48 w-auto mx-auto" />
           </motion.div>
 
           {/* Tagline */}

@@ -3,12 +3,48 @@ import { Button } from "@/components/ui/button";
 import SectionTitle from "@/components/SectionTitle";
 import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface WorkPost {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  video_type: 'upload' | 'youtube' | 'vimeo' | null;
+  video_url: string | null;
+  video_file_path: string | null;
+  thumbnail_url: string | null;
+  created_at: string;
+}
 
 const Work = () => {
   const { ref: gridRef, isInView: gridInView } = useScrollAnimation({ margin: "-50px" });
   const { ref: ctaRef, isInView: ctaInView } = useScrollAnimation();
+  const [projects, setProjects] = useState<WorkPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const projects = [
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('work_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fallbackProjects = [
     {
       category: "Fashion",
       title: "The Runway Edit",
@@ -61,6 +97,8 @@ const Work = () => {
     },
   ];
 
+  const displayProjects = projects.length > 0 ? projects : fallbackProjects;
+
   return (
     <div className="min-h-screen py-24">
       <div className="container mx-auto px-6">
@@ -70,32 +108,54 @@ const Work = () => {
         />
 
         {/* Projects Grid */}
-        <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
-          {projects.map((project, index) => (
-            <motion.div 
-              key={index}
-              className="group cursor-pointer"
-              initial={{ opacity: 0, y: 60 }}
-              animate={gridInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }}
-              transition={{ duration: 0.5, delay: index * 0.08 }}
-              whileHover={{ y: -10 }}
-            >
-              <div className="bg-card border border-border aspect-[4/5] mb-4 overflow-hidden relative">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-gold font-sans text-sm tracking-wider">View Project</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-gold text-sm font-sans tracking-wider">{project.category}</p>
-                <h3 className="font-serif text-xl font-bold text-foreground group-hover:text-gold transition-colors">
-                  {project.title}
-                </h3>
-                <p className="text-muted-foreground text-sm">{project.description}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading projects...</p>
+          </div>
+        ) : (
+          <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+            {displayProjects.map((project, index) => {
+              const projectId = 'id' in project ? project.id : `fallback-${index}`;
+              const thumbnailUrl = 'thumbnail_url' in project ? (project.thumbnail_url as string | null) : null;
+              
+              return (
+                <motion.div 
+                  key={projectId as string}
+                  className="group cursor-pointer"
+                  initial={{ opacity: 0, y: 60 }}
+                  animate={gridInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }}
+                  transition={{ duration: 0.5, delay: index * 0.08 }}
+                  whileHover={{ y: -10 }}
+                >
+                  <div className="bg-card border border-border aspect-[4/5] mb-4 overflow-hidden relative">
+                    {thumbnailUrl ? (
+                      <>
+                        <img 
+                          src={thumbnailUrl} 
+                          alt={project.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="text-gold font-sans text-sm tracking-wider">View Project</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-gold text-sm font-sans tracking-wider">{project.category}</p>
+                    <h3 className="font-serif text-xl font-bold text-foreground group-hover:text-gold transition-colors">
+                      {project.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm">{project.description}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
 
         {/* CTA */}
         <motion.div 

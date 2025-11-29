@@ -35,7 +35,7 @@ const App = () => (
             <Route path="/admin/reset-password" element={<AdminResetPassword />} />
             
             {/* Public routes with Layout */}
-            <Route element={<Layout><Routes><Route path="*" element={null} /></Routes></Layout>}>
+            <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
               <Route path="/what-we-do" element={<WhatWeDo />} />
               <Route path="/work" element={<Work />} />

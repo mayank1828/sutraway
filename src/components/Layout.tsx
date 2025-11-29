@@ -88,6 +88,9 @@ const Layout = () => {
             <img src={sutraLogo} alt="SUTRA" className="h-10 w-auto" />
             <div className="text-muted-foreground text-sm">
               © 2025 SUTRA. Every thread begins with a conversation.
+              <Link to="/admin/login" className="ml-4 text-muted-foreground/40 hover:text-gold transition-colors text-xs">
+                •
+              </Link>
             </div>
             <div className="flex gap-6">
               <a href="mailto:workwithsutra@gmail.com" className="text-foreground hover:text-gold transition-colors text-sm">

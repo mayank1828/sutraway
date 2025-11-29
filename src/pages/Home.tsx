@@ -105,16 +105,43 @@ const Home = () => {
           </p>
 
           {/* Brand Logos */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-            {["Flipkart", "Star Sports", "Heineken", "IPL", "F4", "Nayara Energy"].map((brand, idx) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-12 items-center justify-items-center">
+            {[
+              { name: "Flipkart", url: "flipkart-logo.png" },
+              { name: "Star Sports", url: "starsports-logo.png" },
+              { name: "Heineken", url: "heineken-logo.png" },
+              { name: "IPL", url: "ipl-logo.png" },
+              { name: "F4", url: "f4-logo.png" },
+              { name: "Nayara Energy", url: "nayara-logo.png" }
+            ].map((brand, idx) => (
               <motion.div 
-                key={brand}
-                className="text-muted-foreground hover:text-gold transition-all duration-300 hover:scale-110 cursor-pointer font-sans text-sm tracking-wider"
+                key={brand.name}
+                className="flex flex-col items-center gap-3 hover:scale-110 transition-all duration-300 cursor-pointer"
                 initial={{ opacity: 0, y: 20 }}
                 animate={experienceInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                 transition={{ duration: 0.5, delay: 0.8 + idx * 0.1 }}
               >
-                {brand}
+                <div className="w-24 h-24 md:w-28 md:h-28 bg-card border border-border rounded-lg flex items-center justify-center p-4 hover:border-gold transition-colors">
+                  <img 
+                    src={`/logos/${brand.url}`} 
+                    alt={brand.name}
+                    className="w-full h-full object-contain opacity-70 hover:opacity-100 transition-opacity"
+                    onError={(e) => {
+                      // Fallback to text if image fails to load
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        const textDiv = document.createElement('div');
+                        textDiv.className = 'text-muted-foreground font-sans text-xs text-center';
+                        textDiv.textContent = brand.name;
+                        parent.appendChild(textDiv);
+                      }
+                    }}
+                  />
+                </div>
+                <span className="text-muted-foreground font-sans text-xs tracking-wider">
+                  {brand.name}
+                </span>
               </motion.div>
             ))}
           </div>

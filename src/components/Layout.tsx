@@ -1,9 +1,9 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, Outlet } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import sutraLogo from "@/assets/sutra-logo.png";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -79,7 +79,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </nav>
 
       {/* Main Content */}
-      <main className="pt-20">{children}</main>
+      <main className="pt-20"><Outlet /></main>
 
       {/* Footer */}
       <footer className="border-t border-border mt-32 py-12">

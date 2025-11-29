@@ -1,7 +1,7 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import sutraLogo from "@/assets/sutra-logo.png";
+import sutraLogo from "@/assets/sutra-logo-optimized.png";
 
 const Layout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -27,7 +27,7 @@ const Layout = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="hover:opacity-80 transition-opacity">
-              <img src={sutraLogo} alt="SUTRA" className="h-12 w-auto" />
+              <img src={sutraLogo} alt="SUTRA" width="512" height="320" className="h-12 w-auto" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -85,7 +85,7 @@ const Layout = () => {
       <footer className="border-t border-border mt-32 py-12">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <img src={sutraLogo} alt="SUTRA" className="h-10 w-auto" />
+            <img src={sutraLogo} alt="SUTRA" width="512" height="320" className="h-10 w-auto" />
             <div className="text-muted-foreground text-sm">
               © 2025 SUTRA. Every thread begins with a conversation.
               <Link to="/admin/login" className="ml-4 text-muted-foreground/40 hover:text-gold transition-colors text-xs">

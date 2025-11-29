@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ThreadLine from "@/components/ThreadLine";
 import heroImage from "@/assets/hero-bg.jpg";
-import sutraLogo from "@/assets/sutra-logo.png";
+import sutraLogo from "@/assets/sutra-logo-optimized.png";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
@@ -35,7 +35,7 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.2 }}
           >
-            <img src={sutraLogo} alt="SUTRA" className="h-32 md:h-40 lg:h-48 w-auto mx-auto" />
+            <img src={sutraLogo} alt="SUTRA" width="512" height="320" className="h-32 md:h-40 lg:h-48 w-auto mx-auto" />
           </motion.div>
 
           {/* Tagline */}
@@ -125,6 +125,8 @@ const Home = () => {
                   <img 
                     src={`/logos/${brand.url}`} 
                     alt={brand.name}
+                    width="256"
+                    height="256"
                     className="w-full h-full object-contain opacity-70 hover:opacity-100 transition-opacity"
                     onError={(e) => {
                       // Fallback to text if image fails to load

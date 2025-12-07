@@ -104,7 +104,7 @@ const Work = () => {
       <div className="container mx-auto px-6">
         <SectionTitle 
           title="Our Work" 
-          subtitle="A curated look at stories we've helped shape — from fashion films and real estate launches to restaurant experiences and luxury collaborations."
+          subtitle="A curated look at stories we've helped shape — from fashion films and real estate launches to restaurant experiences and luxury collaborations. Different genres, same precision. Each one built with strategy, craft, and commerce stitched into every frame."
         />
 
         {/* Projects Grid */}

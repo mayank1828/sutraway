@@ -18,7 +18,7 @@ const WhatWeDo = () => {
     {
       icon: Camera,
       title: "Content Production",
-      description: "Films, photo, design, post.",
+      description: "Films, Reels, Music Videos, Product Shoot, Design, Grapics.",
     },
     {
       icon: ShoppingCart,
@@ -70,7 +70,7 @@ const WhatWeDo = () => {
           transition={{ duration: 0.8 }}
         >
           {[
-            "Every brand has a story. We help you tell it, scale it, and sell it.",
+            "Every brand has a story. We help you tell it, scale it, and sell it. — connecting strategy, content, and growth in one seamless rhythm.",
             "From positioning and production to performance and partnerships — Sutra connects it all.",
             "We don't just create campaigns — we build systems."
           ].map((text, idx) => (

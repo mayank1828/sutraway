@@ -8,10 +8,8 @@ interface AdminContextType {
   session: Session | null;
   isAdmin: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
+  sendMagicLink: (email: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  requestPasswordReset: (email: string) => Promise<{ error: Error | null }>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -47,7 +45,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
+      (event, currentSession) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
@@ -56,9 +54,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           setTimeout(async () => {
             const adminStatus = await checkAdminRole(currentSession.user.id);
             setIsAdmin(adminStatus);
+            setLoading(false);
           }, 0);
         } else {
           setIsAdmin(false);
+          setLoading(false);
         }
       }
     );
@@ -82,31 +82,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const sendMagicLink = async (email: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      return { error: null };
-    } catch (error: any) {
-      console.error('Sign in error:', error);
-      return { error };
-    }
-  };
-
-  const signUp = async (email: string, password: string) => {
-    try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/admin/panel`;
       
-      const { error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signInWithOtp({
         email,
-        password,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
         }
       });
 
@@ -114,7 +97,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       return { error: null };
     } catch (error: any) {
-      console.error('Sign up error:', error);
+      console.error('Magic link error:', error);
       return { error };
     }
   };
@@ -136,26 +119,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const requestPasswordReset = async (email: string) => {
-    try {
-      // Only allow password reset for the admin email
-      if (email !== "workwithsutra@gmail.com") {
-        return { error: new Error("Only the admin email (workwithsutra@gmail.com) can reset the password.") };
-      }
-
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/admin/reset-password`,
-      });
-
-      if (error) throw error;
-
-      return { error: null };
-    } catch (error: any) {
-      console.error('Password reset error:', error);
-      return { error };
-    }
-  };
-
   return (
     <AdminContext.Provider
       value={{
@@ -163,10 +126,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         session,
         isAdmin,
         loading,
-        signIn,
-        signUp,
+        sendMagicLink,
         signOut,
-        requestPasswordReset,
       }}
     >
       {children}

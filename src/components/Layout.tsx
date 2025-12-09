@@ -1,7 +1,7 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import sutraLogo from "@/assets/sutra-logo-optimized.png";
+import sutraLogo from "@/assets/sutra-logo.png";
 
 const Layout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

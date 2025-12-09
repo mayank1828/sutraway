@@ -14,8 +14,6 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminPanel from "./pages/AdminPanel";
-import AdminResetPassword from "./pages/AdminResetPassword";
-import AdminSetup from "./pages/AdminSetup";
 import { AdminProvider } from "./contexts/AdminContext";
 
 const queryClient = new QueryClient();
@@ -29,10 +27,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             {/* Admin routes without Layout */}
-            <Route path="/admin/setup" element={<AdminSetup />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/panel" element={<AdminPanel />} />
-            <Route path="/admin/reset-password" element={<AdminResetPassword />} />
             
             {/* Public routes with Layout */}
             <Route element={<Layout />}>

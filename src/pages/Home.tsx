@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ThreadLine from "@/components/ThreadLine";
 import heroImage from "@/assets/hero-bg.jpg";
-import sutraLogo from "@/assets/sutra-logo-optimized.png";
+import sutraLogo from "@/assets/sutra-logo.png";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 

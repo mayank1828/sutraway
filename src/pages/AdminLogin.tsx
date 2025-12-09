@@ -77,6 +77,11 @@ const AdminLogin = () => {
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
+          <img 
+            src="/assets/admin-logo.png" 
+            alt="Admin Logo" 
+            className="w-24 h-auto mx-auto mb-4"
+          />
           <h1 className="text-4xl font-bold mb-2">Admin Login</h1>
           <p className="text-muted-foreground">Access your admin panel</p>
         </div>

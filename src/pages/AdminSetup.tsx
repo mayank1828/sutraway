@@ -103,6 +103,11 @@ const AdminSetup = () => {
           boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1)'
         }}
       >
+        <img 
+          src="/assets/admin-logo.png" 
+          alt="Admin Logo" 
+          className="w-24 h-auto mx-auto mb-4"
+        />
         <h1 className="text-[#4a4a4a] text-2xl font-bold mb-2">Hello, Admin! 👋</h1>
         <p className="text-[#888] text-sm mb-8">Create your admin account to get started.</p>
 

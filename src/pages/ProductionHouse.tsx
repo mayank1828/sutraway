@@ -3,16 +3,60 @@ import { Button } from "@/components/ui/button";
 import SectionTitle from "@/components/SectionTitle";
 import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface ProductionPost {
+  id: string;
+  title: string;
+  type: string;
+  video_url: string | null;
+  video_file_path: string | null;
+  thumbnail_url: string | null;
+  display_order: number;
+}
 
 const ProductionHouse = () => {
   const { ref: ctaRef, isInView: ctaInView } = useScrollAnimation();
+  const [posts, setPosts] = useState<ProductionPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const showcaseItems = [
-    { type: "Podcast", title: "Your Artist Story (Kailash Kher)", frames: 1 },
-    { type: "TVC", title: "Festival Campaign Series", frames: 6 },
-    { type: "Documentary", title: "Beyond The Veil", frames: 3 },
-    { type: "Art Project", title: "The Abstract Line", frames: 3 },
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('production_posts')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+      setPosts(data || []);
+    } catch (error) {
+      console.error('Error fetching production posts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fallbackItems = [
+    { id: 'f1', type: "Podcast", title: "Your Artist Story (Kailash Kher)", video_url: null, video_file_path: null, thumbnail_url: null, display_order: 0 },
+    { id: 'f2', type: "TVC", title: "Festival Campaign Series", video_url: null, video_file_path: null, thumbnail_url: null, display_order: 1 },
+    { id: 'f3', type: "Documentary", title: "Beyond The Veil", video_url: null, video_file_path: null, thumbnail_url: null, display_order: 2 },
+    { id: 'f4', type: "Art Project", title: "The Abstract Line", video_url: null, video_file_path: null, thumbnail_url: null, display_order: 3 },
   ];
+
+  const displayItems = posts.length > 0 ? posts : fallbackItems;
+
+  const getVideoUrl = (post: ProductionPost) => {
+    if (post.video_file_path) {
+      const { data } = supabase.storage.from('work-media').getPublicUrl(post.video_file_path);
+      return data.publicUrl;
+    }
+    return post.video_url;
+  };
 
   return (
     <div className="min-h-screen py-24">
@@ -22,41 +66,57 @@ const ProductionHouse = () => {
           subtitle="Our elite content quality comes from working on large-scale productions — commercials, documentaries, art films, and music videos."
         />
 
-        {/* Showcase Grid */}
-        <div className="max-w-6xl mx-auto space-y-16 mb-24">
-          {showcaseItems.map((item, index) => {
-            const { ref, isInView } = useScrollAnimation();
-            
-            return (
-              <motion.div 
-                key={index} 
-                ref={ref}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -60 : 60 }}
-                animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: index % 2 === 0 ? -60 : 60 }}
-                transition={{ duration: 0.8 }}
-              >
-              <div className="mb-6">
-                <p className="text-gold text-sm font-sans tracking-wider mb-2">{item.type}</p>
-                <h3 className="font-serif text-3xl font-bold text-foreground">{item.title}</h3>
-              </div>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        ) : (
+          <div className="max-w-6xl mx-auto space-y-16 mb-24">
+            {displayItems.map((item, index) => {
+              const { ref, isInView } = useScrollAnimation();
+              const videoUrl = getVideoUrl(item);
               
-              <div className={`grid ${item.frames > 3 ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-3'} gap-4`}>
-                {Array.from({ length: item.frames }).map((_, frameIndex) => (
-                  <div 
-                    key={frameIndex}
-                    className="bg-card border border-border aspect-video hover:border-gold transition-all duration-300 cursor-pointer group relative overflow-hidden"
-                  >
+              return (
+                <motion.div 
+                  key={item.id} 
+                  ref={ref}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -60 : 60 }}
+                  animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: index % 2 === 0 ? -60 : 60 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <div className="mb-6">
+                    <p className="text-gold text-sm font-sans tracking-wider mb-2">{item.type}</p>
+                    <h3 className="font-serif text-3xl font-bold text-foreground">{item.title}</h3>
+                  </div>
+                  
+                  <div className="bg-card border border-border aspect-video hover:border-gold transition-all duration-300 cursor-pointer group relative overflow-hidden">
+                    {item.thumbnail_url ? (
+                      <img 
+                        src={item.thumbnail_url} 
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : videoUrl ? (
+                      <video 
+                        src={videoUrl} 
+                        className="w-full h-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        onMouseEnter={(e) => e.currentTarget.play()}
+                        onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                      />
+                    ) : null}
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-gold font-sans text-sm tracking-wider">View Frame</span>
+                      <span className="text-gold font-sans text-sm tracking-wider">View Project</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-            );
-          })}
-        </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
 
         {/* CTA */}
         <motion.div 

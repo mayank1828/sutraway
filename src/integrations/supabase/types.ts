@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      packages: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          display_order: number | null
+          features: string[]
+          id: string
+          is_popular: boolean | null
+          name: string
+          subtitle: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          features?: string[]
+          id?: string
+          is_popular?: boolean | null
+          name: string
+          subtitle?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          features?: string[]
+          id?: string
+          is_popular?: boolean | null
+          name?: string
+          subtitle?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      production_posts: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          display_order: number | null
+          id: string
+          thumbnail_url: string | null
+          title: string
+          type: string
+          updated_at: string | null
+          video_file_path: string | null
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          id?: string
+          thumbnail_url?: string | null
+          title: string
+          type: string
+          updated_at?: string | null
+          video_file_path?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+          video_file_path?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null

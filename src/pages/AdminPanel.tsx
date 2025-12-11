@@ -8,7 +8,7 @@ import { useAdmin } from '@/contexts/AdminContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
-import { Trash2, Edit, Plus, LogOut, X, Package, Film, Briefcase } from 'lucide-react';
+import { Trash2, Edit, Plus, LogOut, X, Package, Film, Briefcase, Image } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -52,6 +52,14 @@ interface PackageItem {
   created_at: string;
 }
 
+interface SiteImage {
+  id: string;
+  key: string;
+  image_url: string;
+  alt_text: string | null;
+  created_at: string;
+}
+
 const AdminPanel = () => {
   const { user, isAdmin, loading, signOut } = useAdmin();
   const navigate = useNavigate();
@@ -75,6 +83,12 @@ const AdminPanel = () => {
   const [showPackageForm, setShowPackageForm] = useState(false);
   const [editingPackage, setEditingPackage] = useState<PackageItem | null>(null);
   
+  // Site Images State
+  const [siteImages, setSiteImages] = useState<SiteImage[]>([]);
+  const [isLoadingSiteImages, setIsLoadingSiteImages] = useState(true);
+  const [showSiteImageForm, setShowSiteImageForm] = useState(false);
+  const [editingSiteImage, setEditingSiteImage] = useState<SiteImage | null>(null);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Work Form State
@@ -97,6 +111,11 @@ const AdminPanel = () => {
   const [pkgName, setPkgName] = useState('');
   const [pkgSubtitle, setPkgSubtitle] = useState('');
   const [pkgFeatures, setPkgFeatures] = useState('');
+  
+  // Site Image Form State
+  const [imgKey, setImgKey] = useState('');
+  const [imgAltText, setImgAltText] = useState('');
+  const [imgFile, setImgFile] = useState<File | null>(null);
   const [pkgIsPopular, setPkgIsPopular] = useState(false);
 
   useEffect(() => {
@@ -110,6 +129,7 @@ const AdminPanel = () => {
       fetchWorkPosts();
       fetchProductionPosts();
       fetchPackages();
+      fetchSiteImages();
     }
   }, [isAdmin]);
 
@@ -156,6 +176,21 @@ const AdminPanel = () => {
       toast({ title: 'Error fetching packages', description: error.message, variant: 'destructive' });
     } finally {
       setIsLoadingPackages(false);
+    }
+  };
+
+  const fetchSiteImages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_images')
+        .select('*')
+        .order('key', { ascending: true });
+      if (error) throw error;
+      setSiteImages(data || []);
+    } catch (error: any) {
+      toast({ title: 'Error fetching site images', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsLoadingSiteImages(false);
     }
   };
 
@@ -400,6 +435,77 @@ const AdminPanel = () => {
     setShowPackageForm(false);
   };
 
+  // Site Image Handlers
+  const handleSiteImageSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      let imageUrl = editingSiteImage?.image_url || '';
+
+      if (imgFile) {
+        const result = await uploadFile(imgFile, 'site-images');
+        imageUrl = result.publicUrl;
+      }
+
+      if (!imageUrl) {
+        toast({ title: 'Error', description: 'Please upload an image', variant: 'destructive' });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const imgData = {
+        key: imgKey,
+        image_url: imageUrl,
+        alt_text: imgAltText || null,
+      };
+
+      if (editingSiteImage) {
+        const { error } = await supabase.from('site_images').update(imgData).eq('id', editingSiteImage.id);
+        if (error) throw error;
+        toast({ title: 'Updated', description: 'Site image updated.' });
+      } else {
+        const { error } = await supabase.from('site_images').insert([imgData]);
+        if (error) throw error;
+        toast({ title: 'Created', description: 'Site image created.' });
+      }
+
+      resetSiteImageForm();
+      fetchSiteImages();
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditSiteImage = (img: SiteImage) => {
+    setEditingSiteImage(img);
+    setImgKey(img.key);
+    setImgAltText(img.alt_text || '');
+    setShowSiteImageForm(true);
+  };
+
+  const handleDeleteSiteImage = async (id: string) => {
+    if (!confirm('Delete this site image?')) return;
+    try {
+      const { error } = await supabase.from('site_images').delete().eq('id', id);
+      if (error) throw error;
+      toast({ title: 'Deleted', description: 'Site image deleted.' });
+      fetchSiteImages();
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    }
+  };
+
+  const resetSiteImageForm = () => {
+    setImgKey('');
+    setImgAltText('');
+    setImgFile(null);
+    setEditingSiteImage(null);
+    setShowSiteImageForm(false);
+  };
+
   if (loading || !isAdmin) {
     return <div className="min-h-screen flex items-center justify-center bg-background text-foreground">Loading...</div>;
   }
@@ -417,10 +523,10 @@ const AdminPanel = () => {
         </div>
 
         <Tabs defaultValue="work" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="work" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
-              Work Gallery
+              Work
             </TabsTrigger>
             <TabsTrigger value="production" className="flex items-center gap-2">
               <Film className="h-4 w-4" />
@@ -429,6 +535,10 @@ const AdminPanel = () => {
             <TabsTrigger value="packages" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Packages
+            </TabsTrigger>
+            <TabsTrigger value="images" className="flex items-center gap-2">
+              <Image className="h-4 w-4" />
+              Site Images
             </TabsTrigger>
           </TabsList>
 
@@ -696,6 +806,93 @@ const AdminPanel = () => {
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline" onClick={() => handleEditPackage(pkg)}><Edit className="h-4 w-4" /></Button>
                         <Button size="sm" variant="destructive" onClick={() => handleDeletePackage(pkg.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* SITE IMAGES TAB */}
+          <TabsContent value="images">
+            {!showSiteImageForm && (
+              <Button onClick={() => setShowSiteImageForm(true)} className="mb-6">
+                <Plus className="mr-2 h-4 w-4" /> Add Site Image
+              </Button>
+            )}
+
+            {showSiteImageForm && (
+              <motion.form
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onSubmit={handleSiteImageSubmit}
+                className="bg-card p-6 rounded-lg border border-border mb-8 space-y-4"
+              >
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold text-foreground">{editingSiteImage ? 'Edit Site Image' : 'New Site Image'}</h2>
+                  <Button type="button" variant="ghost" size="sm" onClick={resetSiteImageForm}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="imgKey">Image Key</Label>
+                  <Select value={imgKey} onValueChange={setImgKey}>
+                    <SelectTrigger><SelectValue placeholder="Select image location" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hero_background">Hero Background</SelectItem>
+                      <SelectItem value="about_team">About - Team Image</SelectItem>
+                      <SelectItem value="about_story">About - Story Image</SelectItem>
+                      <SelectItem value="logo_main">Main Logo</SelectItem>
+                      <SelectItem value="contact_background">Contact Background</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Choose which image on the site this will replace</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="imgAltText">Alt Text (for accessibility)</Label>
+                  <Input id="imgAltText" value={imgAltText} onChange={(e) => setImgAltText(e.target.value)} placeholder="Describe the image" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="imgFile">Upload Image</Label>
+                  <Input id="imgFile" type="file" accept="image/*" onChange={(e) => setImgFile(e.target.files?.[0] || null)} required={!editingSiteImage} />
+                </div>
+
+                {editingSiteImage?.image_url && (
+                  <div className="space-y-2">
+                    <Label>Current Image</Label>
+                    <img src={editingSiteImage.image_url} alt="Current" className="w-32 h-32 object-cover rounded border" />
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" onClick={resetSiteImageForm}>Cancel</Button>
+                  <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Saving...' : editingSiteImage ? 'Update' : 'Create'}</Button>
+                </div>
+              </motion.form>
+            )}
+
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-foreground">Site Images ({siteImages.length})</h2>
+              {isLoadingSiteImages ? (
+                <p className="text-muted-foreground">Loading...</p>
+              ) : siteImages.length === 0 ? (
+                <p className="text-muted-foreground">No site images yet. Add images to customize your website.</p>
+              ) : (
+                <div className="grid gap-3 md:grid-cols-2">
+                  {siteImages.map((img) => (
+                    <div key={img.id} className="bg-card p-4 rounded-lg border border-border flex gap-4">
+                      <img src={img.image_url} alt={img.alt_text || img.key} className="w-24 h-24 object-cover rounded" />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground capitalize">{img.key.replace(/_/g, ' ')}</h3>
+                        {img.alt_text && <p className="text-sm text-muted-foreground">{img.alt_text}</p>}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Button size="sm" variant="outline" onClick={() => handleEditSiteImage(img)}><Edit className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleDeleteSiteImage(img.id)}><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </div>
                   ))}

@@ -77,28 +77,20 @@ const VideoPlayer = ({
     );
   }
 
-  // Direct video file
+  // Direct video file - always show video, use thumbnail as poster
   if (directVideoUrl) {
     return (
       <div className={`relative ${className}`}>
-        {thumbnailUrl ? (
-          <img 
-            src={thumbnailUrl} 
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <video 
-            src={directVideoUrl} 
-            className="w-full h-full object-cover"
-            muted
-            loop
-            playsInline
-            poster={thumbnailUrl || undefined}
-            onMouseEnter={autoPlayOnHover ? (e) => e.currentTarget.play() : undefined}
-            onMouseLeave={autoPlayOnHover ? (e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; } : undefined}
-          />
-        )}
+        <video 
+          src={directVideoUrl} 
+          className="w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+          poster={thumbnailUrl || undefined}
+          onMouseEnter={autoPlayOnHover ? (e) => e.currentTarget.play() : undefined}
+          onMouseLeave={autoPlayOnHover ? (e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; } : undefined}
+        />
       </div>
     );
   }

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import VideoPlayer from "@/components/VideoPlayer";
 
 interface ProductionPost {
   id: string;
@@ -16,21 +17,11 @@ interface ProductionPost {
   display_order: number;
 }
 
-const getVideoUrl = (post: ProductionPost) => {
-  if (post.video_file_path) {
-    const { data } = supabase.storage.from('work-media').getPublicUrl(post.video_file_path);
-    return data.publicUrl;
-  }
-  return post.video_url;
-};
-
 const ProductionItem = ({ item, index }: { item: ProductionPost; index: number }) => {
   const { ref, isInView } = useScrollAnimation();
-  const videoUrl = getVideoUrl(item);
 
   return (
     <motion.div 
-      key={item.id} 
       ref={ref}
       initial={{ opacity: 0, x: index % 2 === 0 ? -60 : 60 }}
       animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: index % 2 === 0 ? -60 : 60 }}
@@ -42,25 +33,16 @@ const ProductionItem = ({ item, index }: { item: ProductionPost; index: number }
       </div>
       
       <div className="bg-card border border-border aspect-video hover:border-gold transition-all duration-300 cursor-pointer group relative overflow-hidden">
-        {item.thumbnail_url ? (
-          <img 
-            src={item.thumbnail_url} 
-            alt={item.title}
-            className="w-full h-full object-cover"
-          />
-        ) : videoUrl ? (
-          <video 
-            src={videoUrl} 
-            className="w-full h-full object-cover"
-            muted
-            loop
-            playsInline
-            onMouseEnter={(e) => e.currentTarget.play()}
-            onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
-          />
-        ) : null}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <VideoPlayer
+          videoUrl={item.video_url}
+          videoFilePath={item.video_file_path}
+          thumbnailUrl={item.thumbnail_url}
+          title={item.title}
+          className="w-full h-full"
+          autoPlayOnHover={false}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
           <span className="text-gold font-sans text-sm tracking-wider">View Project</span>
         </div>
       </div>

@@ -1,16 +1,20 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ThreadLine from "@/components/ThreadLine";
-import heroImage from "@/assets/hero-bg.jpg";
+import heroImageFallback from "@/assets/hero-bg.jpg";
 import sutraLogo from "@/assets/sutra-logo.png";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useSiteImages } from "@/hooks/use-site-images";
 
 const Home = () => {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const { ref: experienceRef, isInView: experienceInView } = useScrollAnimation();
+  const { getImage } = useSiteImages();
+  
+  const heroImage = getImage('hero_background', heroImageFallback);
 
   return (
     <div className="min-h-screen">
